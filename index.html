@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Rights Atlas - Advanced Document Processing System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff9933; /* saffron */
+            --secondary-color: #ffb366; /* lighter saffron */
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --success-color: #ff9933; /* saffron for success */
+            --warning-color: #f59e0b;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid #e5e7eb;
+        }
+
+        .status-indicator i {
+            color: var(--primary-color);
+        }
+
+        .status-indicator.offline {
+            border-color: var(--danger-color);
+        }
+
+        .status-indicator.offline i {
+            color: var(--danger-color);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Document Type Selection */
+        .document-type-section {
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .document-types-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .document-type-card {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .document-type-card:hover {
+            border-color: var(--primary-color);
+            background: #fff7ed;
+        }
+
+        .document-type-card.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: #fff;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+
+        .document-type-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .document-type-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .document-type-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .document-type-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        /* Upload Methods */
+        .upload-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .upload-method {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .upload-method:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            transform: translateY(-2px);
+        }
+
+        .upload-method-header {
+            padding: 2rem 2rem 1rem 2rem;
+            text-align: center;
+        }
+
+        .upload-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            margin: 0 auto 1.5rem auto;
+            position: relative;
+        }
+
+        .single-upload .upload-icon {
+            background: #a0845c;
+        }
+
+        .bulk-upload .upload-icon {
+            background: #14b8a6;
+        }
+
+        .mobile-upload .upload-icon {
+            background: #0f766e;
+        }
+
+        .upload-method-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-method-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+            margin: 0 2rem 2rem 2rem;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--primary-color);
+            background: #fff7ed;
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .drop-zone-icon {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .drop-zone-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .drop-zone-subtext {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Mobile Upload Specific */
+        .camera-preview {
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem auto;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            display: none;
+        }
+
+        .camera-preview video {
+            width: 100%;
+            height: auto;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-camera {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-capture {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-capture:hover {
+            background: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .btn-cancel {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        /* Progress and Results */
+        .processing-section {
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .processing-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .processing-section h2 i {
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--success-color);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .result-card.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .result-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .document-type-badge {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .confidence-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: var(--success-color);
+            color: white;
+        }
+
+        .confidence-badge.low {
+            background: var(--warning-color);
+        }
+
+        .confidence-badge.very-low {
+            background: var(--danger-color);
+        }
+
+        .extracted-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .extracted-data h4 {
+            grid-column: 1 / -1;
+            margin: 0 0 1rem 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .extracted-data h4::before {
+            content: '📋';
+            font-size: 1.5rem;
+        }
+
+        .field-group {
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .field-group:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .field-group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .data-field {
+            background: #ffffff;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .data-field:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .field-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .field-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #cbd5e1;
+        }
+
+        .field-value {
+            font-size: 1rem;
+            color: var(--dark-color);
+            font-weight: 600;
+            line-height: 1.4;
+            min-height: 1.5rem;
+        }
+
+        .field-value.not-found {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .document-types-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-methods {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .extracted-data {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                padding: 0 0.5rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Form Control Styling */
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        /* Fix for document type selection visibility */
+        .document-type-card.selected .document-type-title,
+        .document-type-card.selected .document-type-description {
+            color: white !important;
+        }
+
+        .document-type-card:not(.selected) .document-type-title {
+            color: var(--primary-color);
+        }
+
+        .document-type-card:not(.selected) .document-type-description {
+            color: #6b7280;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-success { color: var(--success-color); }
+        .text-danger { color: var(--danger-color); }
+        .text-warning { color: var(--warning-color); }
+        .hidden { display: none !important; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-xl);
+            border-left: 4px solid var(--success-color);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        /* Health Check Styles */
+        .health-check-section {
+            background: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .health-check-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-color);
+        }
+
+        .health-check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .health-check-header h4 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .health-check-header h4::before {
+            content: '🏥';
+            font-size: 1.5rem;
+        }
+
+        .health-score {
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .health-score::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .health-score:hover::before {
+            left: 100%;
+        }
+
+        .health-score.good {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .health-score.warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .health-score.critical {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .health-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .health-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .health-stat:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .health-stat i {
+            font-size: 1.2rem;
+        }
+
+        .health-issues {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .health-issues.critical {
+            background: #fee2e2;
+            border-left-color: var(--danger-color);
+        }
+
+        .health-issues.failed {
+            background: #fef2f2;
+            border-left-color: var(--danger-color);
+        }
+
+        .health-issues.warnings {
+            background: #fffbeb;
+            border-left-color: var(--warning-color);
+        }
+
+        .health-issues h5 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .health-issues ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .health-issues li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .health-issues li:last-child {
+            border-bottom: none;
+        }
+
+        .health-issues li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .health-issues.critical h5 {
+            color: var(--danger-color);
+        }
+
+        .health-issues.failed h5 {
+            color: var(--danger-color);
+        }
+
+        .health-issues.warnings h5 {
+            color: var(--warning-color);
+        }
+
+        .health-issues ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .health-issues li {
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        /* Health Info Grid */
+        .health-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .health-info-card {
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .health-info-card:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            transform: translateY(-2px);
+        }
+
+        .health-info-header {
+            margin-bottom: 1rem;
+        }
+
+        .health-info-header i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            background: #fff7ed;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+        }
+
+        .health-info-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .health-info-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Manual Verification Styles */
+        .verification-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .verification-form-panel,
+        .document-image-panel {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .verification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .verification-header h3 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .verification-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .verification-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .verification-form .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .verification-form .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .verification-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .verification-actions .btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verification-actions .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transition: left 0.5s;
+        }
+
+        .verification-actions .btn:hover::before {
+            left: 100%;
+        }
+
+        .verification-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .verification-actions .btn i {
+            font-size: 1.1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8, var(--primary-color));
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 153, 51, 0.15);
+            border: none;
+            border-radius: 999px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            letter-spacing: 0.03em;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+
+        .btn-success:hover {
+            background: #ff8800;
+            box-shadow: 0 4px 16px rgba(255, 153, 51, 0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            color: white;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706, var(--warning-color));
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+            border: none;
+            border-radius: 999px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            letter-spacing: 0.03em;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.18);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .image-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .image-header h3 {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .image-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: #f9fafb;
+            border-color: var(--primary-color);
+        }
+
+        .document-image-container {
+            max-height: 500px;
+            overflow: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f9fafb;
+        }
+
+        .document-image {
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .document-image.zoomed {
+            cursor: zoom-out;
+        }
+
+        /* Verification Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-control:required {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Form Section Headers */
+        .verification-form h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0 1rem 0;
+            color: #2563eb !important;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .verification-form h4:first-of-type {
+            margin-top: 0;
+        }
+
+        .verification-form h4 i {
+            color: #2563eb;
+            font-size: 1rem;
+        }
+
+        /* Enhanced form layout */
+        .verification-form {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .verification-form::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .verification-form::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .verification-form::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .verification-form::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Document Image Zoom Styles */
+        #documentImageContainer {
+            position: relative;
+            overflow: auto;
+        }
+
+        #documentImageContainer.grabbing {
+            cursor: grabbing !important;
+        }
+
+        #verificationDocumentImage {
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+        }
+
+        #verificationDocumentImage.zoomed {
+            cursor: move;
+        }
+
+        /* Fullscreen Modal */
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fullscreen-modal.active {
+            display: flex;
+        }
+
+        .fullscreen-content {
+            position: relative;
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow: auto;
+        }
+
+        .fullscreen-image {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .fullscreen-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .fullscreen-controls button {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .fullscreen-controls button:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+
+        @media (max-width: 768px) {
+            .verification-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .verification-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <img src="astitva_logo.svg" alt="Astitva Logo">
+                Document Digitization
+            </div>
+            <div class="status-indicator" id="apiStatus">
+                <i class="fas fa-circle pulse"></i>
+                <span id="statusText">Checking API...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Document Type Selection -->
+        <section class="document-type-section fade-in">
+            <h1 class="section-title">Upload Documents</h1>
+            <p class="section-subtitle">Select the type of document you want to upload and choose an upload method.</p>
+            
+            <div class="document-types-grid" id="documentTypesGrid">
+                <!-- Document types will be loaded dynamically -->
+            </div>
+
+            <div class="text-center mt-4">
+                <label style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 0.875rem;">
+                    <input type="checkbox" id="autoDetect" checked>
+                    <span>Auto-detect document type (recommended)</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Upload Methods -->
+        <div class="upload-methods">
+            <!-- Single Upload -->
+            <div class="upload-method single-upload fade-in">
+                <div class="upload-method-header">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="upload-method-title">Drag & Drop</div>
+                    <div class="upload-method-description">
+                        Upload a single document.
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="singleDropZone">
+                    <div class="drop-zone-content">
+                        <i class="fas fa-cloud-upload-alt drop-zone-icon"></i>
+                        <div class="drop-zone-text">Drop your document here</div>
+                        <div class="drop-zone-subtext">or click to browse (Max 25MB)</div>
+                    </div>
+                    <input type="file" class="file-input" id="singleFileInput" accept="image/*,.pdf">
+                </div>
+            </div>
+
+            <!-- Bulk Upload -->
+            <div class="upload-method bulk-upload fade-in">
+                <div class="upload-method-header">
+                    <div class="upload-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="upload-method-title">Bulk Upload</div>
+                    <div class="upload-method-description">
+                        Upload multiple documents at once.
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="bulkDropZone">
+                    <div class="drop-zone-content">
+                        <i class="fas fa-folder-open drop-zone-icon"></i>
+                        <div class="drop-zone-text">Drop multiple documents here</div>
+                        <div class="drop-zone-subtext">or click to select multiple files</div>
+                    </div>
+                    <input type="file" class="file-input" id="bulkFileInput" accept="image/*,.pdf" multiple>
+                </div>
+            </div>
+
+            <!-- Mobile Upload -->
+            <div class="upload-method mobile-upload fade-in">
+                <div class="upload-method-header">
+                    <div class="upload-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="upload-method-title">Mobile Upload</div>
+                    <div class="upload-method-description">
+                        Upload using your mobile camera.
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="mobileDropZone">
+                    <div class="drop-zone-content">
+                        <i class="fas fa-camera drop-zone-icon"></i>
+                        <div class="drop-zone-text">Capture Document Photo</div>
+                        <div class="drop-zone-subtext">Use camera for live document capture</div>
+                    </div>
+                </div>
+
+                <div class="camera-preview" id="cameraPreview">
+                    <video id="cameraVideo" autoplay playsinline></video>
+                </div>
+
+                <div class="camera-controls hidden" id="cameraControls">
+                    <button class="btn-camera btn-capture" id="captureBtn">
+                        <i class="fas fa-camera"></i>
+                        Capture
+                    </button>
+                    <button class="btn-camera btn-cancel" id="cancelCameraBtn">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Check Information -->
+        <section class="document-type-section fade-in">
+            <h2 class="section-title">Health Check</h2>
+            <p class="section-subtitle">System status and validation feature details.</p>
+            
+            <h3 style="font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin: 2rem 0 1.5rem 0;">Validation Features</h3>
+            
+            <div class="health-info-grid">
+                <div class="health-info-card">
+                    <div class="health-info-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Pre-scrutiny</h3>
+                    </div>
+                    <p>Checks for basic document integrity and format compliance to ensure processability.</p>
+                </div>
+                
+                <div class="health-info-card">
+                    <div class="health-info-header">
+                        <i class="fas fa-check-double"></i>
+                        <h3>Validation</h3>
+                    </div>
+                    <p>Verifies accuracy of extracted data against predefined rules and databases.</p>
+                </div>
+                
+                <div class="health-info-card">
+                    <div class="health-info-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Scoring</h3>
+                    </div>
+                    <p>Assigns a confidence score to the extracted data based on validation results.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Processing Section -->
+        <section class="processing-section" id="processingSection">
+            <h2>
+                <i class="fas fa-circle" style="color: var(--primary-color);"></i>
+                Processing Document...
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Extracting data from document. Please wait.</p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="text-center" id="processingStatus">
+                <div class="loading-spinner"></div>
+                <span class="ml-2">Processing documents...</span>
+            </div>
+
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
+        </section>
+
+        <!-- Manual Verification Section -->
+        <section class="document-type-section fade-in" id="verificationSection" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <nav style="display: flex; gap: 2rem; margin-bottom: 1rem;">
+                        <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">Dashboard</a>
+                        <a href="#" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem; font-weight: 600;">Verification</a>
+                        <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">Reports</a>
+                        <a href="#" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem;">Settings</a>
+                    </nav>
+                    <h1 style="font-size: 2rem; font-weight: 600; color: var(--text-primary); margin: 0;">Manual Verification</h1>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="status-indicator">
+                        <i class="fas fa-circle"></i>
+                        <span id="statusText">API Status: Online</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">U</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 400px; gap: 3rem; margin-top: 2rem;">
+                <!-- Verification Form Panel -->
+                <div style="background: #ffffff; border-radius: var(--border-radius); padding: 2rem; border: 1px solid #e5e7eb; max-height: 70vh; overflow-y: auto;">
+                    <h3 style="margin-bottom: 2rem; color: var(--text-primary); font-size: 1.25rem; font-weight: 600;">
+                        Manual Verification
+                    </h3>
+                    
+                    <form id="verificationForm" style="display: grid; gap: 2rem;">
+                        <!-- Basic Information -->
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">
+                                Basic Information
+                            </h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="claimantName">Applicant Name</label>
+                                    <input type="text" id="claimantName" name="claimant_name" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="fatherName">Father's Name</label>
+                                    <input type="text" id="fatherName" name="father_name" class="form-control">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender" name="gender" class="form-control">
+                                        <option value="">Male</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="dateOfBirth">Date of Birth</label>
+                                    <input type="date" id="dateOfBirth" name="date_of_birth" class="form-control" placeholder="mm/dd/yyyy">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Address Information -->
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">
+                                Address Information
+                            </h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="village">Village</label>
+                                    <input type="text" id="village" name="village" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="district">District</label>
+                                    <input type="text" id="district" name="district" class="form-control" required>
+                                </div>
+                                
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <label for="state">State</label>
+                                    <input type="text" id="state" name="state" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Claim Details -->
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">
+                                Claim Details
+                            </h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="claimType">Claim Type</label>
+                                    <input type="text" id="claimType" name="claim_type" class="form-control">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="claimDate">Claim Date</label>
+                                    <input type="date" id="claimDate" name="claim_date" class="form-control" placeholder="mm/dd/yyyy">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Land Information -->
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">
+                                Land Information
+                            </h4>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="landArea">Land Area (in hectares)</label>
+                                    <input type="text" id="landArea" name="land_area" class="form-control">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="landLocation">Land Location</label>
+                                    <input type="text" id="landLocation" name="land_location" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <h4 style="color: #2563eb; margin: 1.5rem 0 1rem 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                            <i class="fas fa-file-alt"></i>
+                            Claim Details
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="dateSubmitted">Date Submitted</label>
+                            <input type="date" id="dateSubmitted" name="date_submitted" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="claimStatus">Claim Status</label>
+                            <select id="claimStatus" name="claim_status" class="form-control">
+                                <option value="">Select Status</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Under Review">Under Review</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="scheduledTribe">Scheduled Tribe *</label>
+                            <select id="scheduledTribe" name="scheduled_tribe" class="form-control" required>
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Land Information -->
+                        <h4 style="color: #2563eb; margin: 1.5rem 0 1rem 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                            <i class="fas fa-map"></i>
+                            Land Information
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="surveyNumber">Survey Number</label>
+                            <input type="text" id="surveyNumber" name="survey_number" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="titleNumber">Title Number</label>
+                            <input type="text" id="titleNumber" name="title_number" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="areaGranted">Area Granted</label>
+                            <input type="text" id="areaGranted" name="area_granted" class="form-control" placeholder="e.g., 2.5 hectares">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="issueDate">Issue Date</label>
+                            <input type="date" id="issueDate" name="issue_date" class="form-control">
+                        </div>
+                        
+                        <!-- Verification Information -->
+                        <h4 style="color: #2563eb; margin: 1.5rem 0 1rem 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                            <i class="fas fa-check-circle"></i>
+                            Verification Information
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="committeeType">Committee Type</label>
+                            <select id="committeeType" name="committee_type" class="form-control">
+                                <option value="">Select Committee</option>
+                                <option value="Gram Sabha">Gram Sabha</option>
+                                <option value="SDLC">SDLC (Sub-Divisional Level Committee)</option>
+                                <option value="DLC">DLC (District Level Committee)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="verificationDate">Verification Date</label>
+                            <input type="date" id="verificationDate" name="verification_date" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recommendation">Recommendation</label>
+                            <select id="recommendation" name="recommendation" class="form-control">
+                                <option value="">Select Recommendation</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <h4 style="color: #2563eb; margin: 1.5rem 0 1rem 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem;">
+                            <i class="fas fa-phone"></i>
+                            Contact Information
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="mobileNumber">Mobile Number *</label>
+                            <input type="tel" id="mobileNumber" name="mobile_number" class="form-control" required pattern="[0-9]{10}" placeholder="Enter 10-digit mobile number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="officialNotes">Official Notes</label>
+                            <textarea id="officialNotes" name="official_notes" class="form-control" rows="3" placeholder="Add any verification notes or comments..."></textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button type="button" class="btn btn-success" onclick="processor.submitVerification('APPROVED')" style="flex: 1;">
+                                <i class="fas fa-check-circle"></i>
+                                Approve
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="processor.submitVerification('REJECTED')" style="flex: 1;">
+                                <i class="fas fa-times-circle"></i>
+                                Reject
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Document Image Panel -->
+                <div class="upload-method" style="padding: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; color: #2563eb;">
+                        <i class="fas fa-image"></i>
+                        Original Document
+                    </h3>
+                    
+                    <!-- Zoom Controls -->
+                    <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                        <button type="button" id="zoomInBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-search-plus"></i>
+                            Zoom In
+                        </button>
+                        <button type="button" id="zoomOutBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-search-minus"></i>
+                            Zoom Out
+                        </button>
+                        <button type="button" id="resetZoomBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            Reset
+                        </button>
+                        <button type="button" id="fullscreenBtn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-expand"></i>
+                            Fullscreen
+                        </button>
+                    </div>
+                    
+                    <!-- Document Image Container -->
+                    <div id="documentImageContainer" style="
+                        border: 2px solid #d1d5db; 
+                        border-radius: 8px; 
+                        background: #f9fafb;
+                        overflow: auto;
+                        max-height: 600px;
+                        position: relative;
+                        cursor: grab;
+                    ">
+                        <img id="verificationDocumentImage" src="" alt="Document for verification" style="
+                            width: 100%; 
+                            height: auto;
+                            display: block;
+                            transition: transform 0.3s ease;
+                            transform-origin: center center;
+                        ">
+                    </div>
+                    
+                    <div style="margin-top: 1rem; text-align: center; color: #6b7280; font-size: 0.9rem;">
+                        💡 <strong>Tips:</strong> Use zoom controls above, click and drag to pan, or double-click to toggle zoom
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Fullscreen Modal for Document Image -->
+    <div id="fullscreenModal" class="fullscreen-modal">
+        <div class="fullscreen-content">
+            <div class="fullscreen-controls">
+                <button id="fullscreenZoomIn">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="fullscreenZoomOut">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button id="fullscreenReset">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </button>
+                <button id="closeFullscreen">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <img id="fullscreenImage" class="fullscreen-image" src="" alt="Document fullscreen">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
