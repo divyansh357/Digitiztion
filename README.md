@@ -129,6 +129,9 @@ ocr/
    - Navigate to: **http://localhost:8000**
    - The main interface will load automatically
 
+6. # To exit the virtual environment
+     deactivate
+
 ### Troubleshooting
 
 **Virtual Environment Activation Issues:**
