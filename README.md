@@ -118,6 +118,7 @@ ocr/
    ```powershell
    # Run the FastAPI server
    python main.py
+   # Go live with index.html(actual interface)
    
    # Server will start on http://localhost:8000
    # You should see: "Uvicorn running on http://0.0.0.0:8000"
