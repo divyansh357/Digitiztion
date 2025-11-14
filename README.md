@@ -3,6 +3,44 @@
 ## Overview
 Advanced OCR system for Forest Rights Act (FRA) document processing with automated health checking and manual verification workflows.
 
+## Technology Stack
+
+### Backend Technologies
+- **FastAPI** - Modern, high-performance Python web framework for building APIs
+- **Uvicorn** - Lightning-fast ASGI server implementation
+- **PaddleOCR** (v3.2.0+) - Advanced OCR engine with multi-language support
+- **PaddlePaddle** (v3.2.0+) - Deep learning framework powering OCR models
+- **OpenCV** (cv2) - Computer vision library for image preprocessing
+- **NumPy** - Numerical computing for array operations
+- **Pillow (PIL)** - Python Imaging Library for image manipulation
+- **Pydantic** (v2.0+) - Data validation using Python type annotations
+- **SQLite** - Lightweight database for document storage
+
+### Frontend Technologies
+- **HTML5** - Modern semantic markup
+- **CSS3** - Advanced styling with CSS Variables and Flexbox/Grid
+- **Vanilla JavaScript (ES6+)** - Native browser JavaScript without frameworks
+- **Font Awesome** (v6.4.0) - Icon library for UI elements
+- **Animate.css** (v4.1.1) - CSS animation library
+
+### Image Processing Pipeline
+- **cv2.medianBlur** - Noise removal from scanned documents
+- **CLAHE** (Contrast Limited Adaptive Histogram Equalization) - Image enhancement
+- **Grayscale conversion** - Preprocessing for better OCR accuracy
+- **Base64 encoding** - Image data transmission
+
+### APIs & Communication
+- **RESTful API** - Standard HTTP methods (GET, POST)
+- **CORS Middleware** - Cross-Origin Resource Sharing support
+- **JSON** - Data interchange format
+- **Multipart Form Data** - File upload handling
+
+### Development Tools
+- **Python 3.8+** - Core programming language
+- **pip** - Package management
+- **Virtual Environment (venv)** - Isolated Python environment
+- **Git** - Version control system
+
 ## Features
 
 ### 🔍 Document Processing
@@ -40,28 +78,83 @@ ocr/
 └── venv/               # Virtual environment
 ```
 
-## Installation
+## Installation & Setup
 
-1. **Create Virtual Environment**
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate  # Windows
-   # or
-   source venv/bin/activate  # Linux/Mac
+### Prerequisites
+- Python 3.8 or higher
+- pip (Python package manager)
+- Git (for cloning the repository)
+
+### Step-by-Step Installation
+
+1. **Clone the Repository**
+   ```powershell
+   git clone https://github.com/divyansh357/Digitiztion.git
+   cd Digitiztion
    ```
 
-2. **Install Dependencies**
-   ```bash
+2. **Create Virtual Environment**
+   ```powershell
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment (Windows PowerShell)
+   .\venv\Scripts\Activate.ps1
+   
+   # If you encounter execution policy error, run:
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+3. **Install Dependencies**
+   ```powershell
+   # Upgrade pip first
+   python -m pip install --upgrade pip
+   
+   # Install all required packages
    pip install -r requirements.txt
    ```
 
-3. **Run Server**
-   ```bash
+4. **Start the Server**
+   ```powershell
+   # Run the FastAPI server
    python main.py
+   
+   # Server will start on http://localhost:8000
+   # You should see: "Uvicorn running on http://0.0.0.0:8000"
    ```
 
-4. **Access Application**
-   Open browser to: http://localhost:8000
+5. **Access the Application**
+   - Open your web browser
+   - Navigate to: **http://localhost:8000**
+   - The main interface will load automatically
+
+### Troubleshooting
+
+**Virtual Environment Activation Issues:**
+```powershell
+# If .\venv\Scripts\Activate.ps1 doesn't work, try:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\venv\Scripts\Activate.ps1
+```
+
+**Port Already in Use:**
+```powershell
+# If port 8000 is busy, modify main.py or kill the process:
+netstat -ano | findstr :8000
+taskkill /PID <process_id> /F
+```
+
+**Missing Dependencies:**
+```powershell
+# Reinstall all dependencies
+pip install --upgrade -r requirements.txt
+```
+
+### Quick Start (All-in-One)
+```powershell
+# Clone, setup, and run in one go
+git clone https://github.com/divyansh357/Digitiztion.git; cd Digitiztion; python -m venv venv; .\venv\Scripts\Activate.ps1; pip install -r requirements.txt; python main.py
+```
 
 ## API Endpoints
 
