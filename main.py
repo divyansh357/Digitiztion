@@ -99,15 +99,17 @@ print("Loading PaddleOCR-VL-0.9B models into memory...")
 print("Multi-language support: Odia, Hindi, Tamil, English")
 print("=" * 50)
 
-# Initialize PaddleOCR-VL-0.9B model
-ocr_engine = None
+# Initialize OCR engines
+vl_ocr_engine = None
+standard_ocr_engine = None
 use_vl_model = False
 
 if PADDLEX_AVAILABLE:
     try:
         print("Creating PaddleOCR-VL-0.9B model...")
-        ocr_engine = create_model("PaddleOCR-VL-0.9B")
+        vl_ocr_engine = create_model("PaddleOCR-VL-0.9B")
         use_vl_model = True
+        print(f"PaddleOCR-VL engine initialized: {type(vl_ocr_engine).__name__}")
         print("✅ PaddleOCR-VL-0.9B loaded successfully!")
         print("   Supported Languages: Odia, Hindi, Tamil, English")
         print("   Model Type: Vision-Language OCR")
@@ -117,25 +119,81 @@ if PADDLEX_AVAILABLE:
         print("Falling back to standard PaddleOCR...")
         PADDLEX_AVAILABLE = False
 
-# Fallback to standard PaddleOCR if VL model fails
-if not PADDLEX_AVAILABLE or ocr_engine is None:
+def initialize_standard_ocr():
+    """Ensure the standard PaddleOCR engine is ready (lazy initialization)."""
+    global standard_ocr_engine
+    if standard_ocr_engine is not None:
+        return standard_ocr_engine
+
     print("Initializing standard PaddleOCR with multi-language support...")
     try:
-        # Use English as base, but it can handle multiple Indic languages
-        ocr_engine = PaddleOCR(
+        standard_ocr_engine = PaddleOCR(
             use_textline_orientation=True,
-            lang='en',  # Base language
+            lang='en',
             text_det_thresh=0.3,
             text_det_box_thresh=0.5,
             text_det_unclip_ratio=1.6,
-            use_mp=True,
-            total_process_num=2,
         )
         print("✅ Standard PaddleOCR loaded (fallback mode)")
         print("   Note: For better Odia/Tamil support, install PaddleX")
     except Exception as e:
-        print(f"❌ Failed to load any OCR engine: {e}")
+        print(f"❌ Failed to load standard PaddleOCR: {e}")
         raise
+
+    return standard_ocr_engine
+
+# Always prepare standard OCR (needed even when VL succeeds for fallback processing)
+initialize_standard_ocr()
+
+def run_vl_ocr(image_bgr: np.ndarray) -> str:
+    """
+    Run PaddleOCR-VL-0.9B on the given BGR image and return extracted text.
+    """
+    if not use_vl_model or vl_ocr_engine is None:
+        return ""
+
+    try:
+        img_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+        pil_img = Image.fromarray(img_rgb)
+        vl_prompt = (
+            "OCR: Transcribe every piece of text you can see in this document image. "
+            "Preserve the original language (Odia/Hindi/Tamil/English) and line breaks."
+        )
+        vl_inputs = {"image": pil_img, "query": vl_prompt}
+        vl_results = list(
+            vl_ocr_engine.predict(
+                vl_inputs,
+                skip_special_tokens=True,
+                max_new_tokens=4096,
+            )
+        )
+
+        if not vl_results:
+            return ""
+
+        # DocVLMResult behaves like a dict
+        primary = vl_results[0]
+        vl_text = ""
+
+        if isinstance(primary, dict):
+            vl_text = primary.get("result", "") or primary.get("text", "")
+        else:
+            # Fallback to attribute-style access
+            vl_text = getattr(primary, "result", "")
+
+        if vl_text:
+            print(
+                f"✓ VL model produced {len(vl_text.splitlines())} lines, {len(vl_text)} characters"
+            )
+            return normalize_hindi_text(vl_text)
+
+    except Exception as vl_error:
+        print(f"⚠ VL model error: {vl_error}")
+        import traceback
+
+        traceback.print_exc()
+
+    return ""
 
 print("=" * 50)
 print("Models loaded successfully!")
@@ -578,57 +636,20 @@ def extract_text_from_image(image_bytes: bytes, enhance_image: bool = True) -> s
         print(f"Image loaded: shape={img.shape}, dtype={img.dtype}")
         
         # Try VL model first if available (PaddleOCR-VL-0.9B)
-        if use_vl_model:
-            try:
-                print("Using PaddleOCR-VL-0.9B for multi-language OCR...")
-                img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                pil_img = Image.fromarray(img_rgb)
-                
-                vl_result = ocr_engine.predict(pil_img)
-                
-                extracted_texts = []
-                if vl_result and hasattr(vl_result, 'json'):
-                    result_json = vl_result.json
-                    if 'ocr_text' in result_json:
-                        extracted_texts.append(result_json['ocr_text'])
-                    elif 'texts' in result_json:
-                        texts = result_json['texts']
-                        scores = result_json.get('scores', [1.0] * len(texts))
-                        for text, score in zip(texts, scores):
-                            if score >= 0.3 and text.strip():
-                                extracted_texts.append(text.strip())
-                    elif 'result' in result_json:
-                        for item in result_json['result']:
-                            if isinstance(item, dict) and 'text' in item:
-                                extracted_texts.append(item['text'])
-                            elif isinstance(item, str):
-                                extracted_texts.append(item)
-                elif isinstance(vl_result, dict):
-                    if 'texts' in vl_result or 'rec_texts' in vl_result:
-                        texts = vl_result.get('texts', vl_result.get('rec_texts', []))
-                        scores = vl_result.get('scores', vl_result.get('rec_scores', [1.0] * len(texts)))
-                        for text, score in zip(texts, scores):
-                            if score >= 0.3 and text.strip():
-                                extracted_texts.append(text.strip())
-                
-                if extracted_texts:
-                    vl_text = '\n'.join(extracted_texts)
-                    print(f"✓ VL Model extracted {len(extracted_texts)} lines, {len(vl_text)} characters")
-                    return normalize_hindi_text(vl_text)
-                else:
-                    print("⚠ VL model returned no text, falling back to standard OCR")
-            except Exception as e:
-                print(f"⚠ VL model error: {e}")
-                import traceback
-                traceback.print_exc()
-                print("Falling back to standard PaddleOCR...")
+        if use_vl_model and vl_ocr_engine is not None:
+            print("Using PaddleOCR-VL-0.9B for multi-language OCR...")
+            vl_text = run_vl_ocr(img)
+            if vl_text:
+                return vl_text
+            print("⚠ VL model returned no text, falling back to standard OCR")
         
         # Try standard OCR first (simpler, works for both English and Hindi)
         print("Attempting standard OCR...")
         result_to_use = None
+        std_engine = initialize_standard_ocr()
         
         try:
-            result = ocr_engine.ocr(img)
+            result = std_engine.ocr(img)
             
             if result and len(result) > 0:
                 # Check if it's the new dict format (PaddleOCR v4)
@@ -654,7 +675,7 @@ def extract_text_from_image(image_bytes: bytes, enhance_image: bool = True) -> s
             try:
                 img_hindi = preprocess_for_hindi(image_bytes)
                 if img_hindi is not None:
-                    result = ocr_engine.ocr(img_hindi)
+                    result = std_engine.ocr(img_hindi)
                     if result and len(result) > 0 and result[0]:
                         print(f"Hindi preprocessing: detected {len(result[0])} text regions")
                         result_to_use = result
