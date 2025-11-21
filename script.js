@@ -259,12 +259,17 @@ class FRADocumentProcessor {
         this.updateProgress(0);
 
         try {
-            // Convert file to base64 for verification purposes
+            // Convert file to base64 for verification purposes (only for non-PDF files)
             const imageBase64 = await this.fileToBase64(file);
             const result = await this.processFile(file, 'single');
             
             // Add the image data to the result for verification
-            result.document_image_base64 = imageBase64;
+            // For PDFs, use the first page image from page_images_base64
+            if (result.page_images_base64 && result.page_images_base64.length > 0) {
+                result.document_image_base64 = result.page_images_base64[0];
+            } else {
+                result.document_image_base64 = imageBase64;
+            }
             
             this.displayResults([result]);
             this.updateProgress(100);
@@ -292,7 +297,13 @@ class FRADocumentProcessor {
             for (let i = 0; i < results.results.length; i++) {
                 if (i < validFiles.length) {
                     try {
-                        results.results[i].document_image_base64 = await this.fileToBase64(validFiles[i]);
+                        const result = results.results[i];
+                        // For PDFs, use the first page image; for images, convert to base64
+                        if (result.page_images_base64 && result.page_images_base64.length > 0) {
+                            result.document_image_base64 = result.page_images_base64[0];
+                        } else {
+                            result.document_image_base64 = await this.fileToBase64(validFiles[i]);
+                        }
                     } catch (error) {
                         console.error('Failed to convert file to base64:', error);
                     }
@@ -336,7 +347,12 @@ class FRADocumentProcessor {
             const result = await this.processFile(file, 'mobile', locationData);
             
             // Add the image data to the result for verification
-            result.document_image_base64 = imageBase64;
+            // For PDFs, use the first page image from page_images_base64
+            if (result.page_images_base64 && result.page_images_base64.length > 0) {
+                result.document_image_base64 = result.page_images_base64[0];
+            } else {
+                result.document_image_base64 = imageBase64;
+            }
             
             this.displayResults([result]);
             this.updateProgress(100);
@@ -670,7 +686,12 @@ class FRADocumentProcessor {
         const verificationBtn = card.querySelector('.verification-btn');
         if (verificationBtn) {
             verificationBtn.addEventListener('click', () => {
-                this.startVerification(result.extracted_data, result.document_image_base64 || '');
+                // For PDFs, use the first page image; for images, use the original
+                let documentImage = result.document_image_base64 || '';
+                if (result.page_images_base64 && result.page_images_base64.length > 0) {
+                    documentImage = result.page_images_base64[0];
+                }
+                this.startVerification(result.extracted_data, documentImage);
             });
         }
 

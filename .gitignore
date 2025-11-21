@@ -23,11 +23,12 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtualenv
+# Virtual Environments
 .env
 .venv
 env/
 venv/
+venv311/
 ENV/
 env.bak/
 venv.bak/
@@ -36,10 +37,88 @@ venv.bak/
 .vscode/
 .idea/
 *.code-workspace
+*.swp
+*.swo
+*~
 
-# Other
-.ipynb_checkpoints
-*.log
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database
 *.sqlite3
 *.sqlite3-journal
-.DS_Store
+*.db
+*.db-journal
+fra_documents.db
+
+# Logs
+*.log
+logs/
+*.out
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PaddleOCR / PaddleX Model Cache
+.paddlex/
+*.pdmodel
+*.pdiparams
+*.pdopt
+inference.yml
+
+# Uploaded Files & Test Data
+uploads/
+test_data/
+temp/
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tif
+*.tiff
+
+# Environment Variables
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Coverage Reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# pytype
+.pytype/
+
+# Cython
+*.c
+*.so
+
+# Distribution / Packaging
+*.whl
+
+# Backup Files
+*.bak
+*.backup
+*.old
+*.orig
